@@ -201,6 +201,7 @@ function getWeekNumber(d) {
     return [d.getFullYear(), weekNo];
 }
 
-AJS.Report = {};
-AJS.Report.possibleMilestones = possibleMilestoneLabels;
-AJS.Report.init = init;
+var Report = {};
+Report.possibleMilestones = possibleMilestoneLabels;
+Report.init = init;
+window.Report = Report;
