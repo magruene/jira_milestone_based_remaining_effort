@@ -3,15 +3,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js"></script>
 <script src="http://rawgit.com/magruene/jira_milestone_based_remaining_effort/master/js/report.js"></script>
 <script>
-    var gadget;
-    gadget = AJS.Gadget({
-        baseUrl: "http://jira.swisscom.com",
-        view: {
-            onResizeAdjustHeight: true,
-            template: function (args) {
-                Report.init();
+    AJS.$(function () {
+        var gadget;
+        gadget = AJS.Gadget({
+            baseUrl: "http://jira.swisscom.com",
+            view: {
+                onResizeAdjustHeight: true,
+                template: function (args) {
+                    Report.init();
+                }
             }
-        }
+        });
     });
 </script>
 
