@@ -65,7 +65,7 @@ function resetTable() {
         AJS.$("#reportTable thead tr").append("<th>" + mileStone + "</th>");
     });
 
-    //gadget.resize();
+    gadget.resize();
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
