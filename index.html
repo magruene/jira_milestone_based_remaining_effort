@@ -1,18 +1,22 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.css" rel="stylesheet"/>
+<script src="js/jquery-2.1.4.min.js"></script>
+<script src="js/underscore-min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js"></script>
-<script src="http://rawgit.com/magruene/jira_milestone_based_remaining_effort/master/js/report.js"></script>
+<script src="js/report.js"></script>
+<!--<script src="http://rawgit.com/magruene/jira_milestone_based_remaining_effort/master/js/report.js"></script>-->
 <script>
-    AJS.$(window).load(function () {
-        window.gadget = AJS.Gadget({
-            baseUrl: "http://jira.swisscom.com",
-            view: {
-                onResizeAdjustHeight: true,
-                template: function (args) {
+    $(window).load(function () {
+//        window.gadget = AJS.Gadget({
+//            baseUrl: "http://jira.swisscom.com",
+//            view: {
+//                onResizeAdjustHeight: true,
+//                template: function (args) {
                     Report.init();
-                }
-            }
-        });
+//                    gadget.resize();
+//                }
+//            }
+//        });
     });
 </script>
 

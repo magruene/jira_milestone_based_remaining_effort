@@ -1,7 +1,14 @@
 var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     possibleMilestoneLabels = ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
     numberOfWeeksInThePast = 8,
-    selectedMilestoneLabels;
+    selectedMilestoneLabels,
+    sumPerMileStone = {};
+
+//if not on jira, we need to initialize this.
+if (!AJS) {
+    var AJS = {};
+    AJS.$ = $;
+}
 
 
 function init() {
@@ -28,7 +35,6 @@ function init() {
     });
 }
 
-
 function startReportGeneration() {
     resetTable();
 
@@ -42,6 +48,22 @@ function startReportGeneration() {
             ajaxCallUnique(url, team, i, consolidatePastEffort);
         }
     });
+
+    AJS.$(document).ajaxStop(function () {
+        AJS.$.each(teams, function (index, team) {
+            var currentSum = 0;
+            AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
+                currentSum += sumPerMileStone[team][mileStone];
+
+                if (sumPerMileStone[team][mileStone] > 0) {
+                    AJS.$("#" + team + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
+                } else {
+                    AJS.$("#" + team + " #" + mileStone).text(0);
+                }
+            });
+        });
+    });
+
 }
 
 function resetTable() {
@@ -61,11 +83,16 @@ function resetTable() {
     }
 
     selectedMilestoneLabels = AJS.$('#labelChooser').val().split(",");
+    AJS.$.each(teams, function (index, team) {
+        sumPerMileStone[team] = {};
+        AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
+            sumPerMileStone[team][mileStone] = 0;
+        });
+    });
+
     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
         AJS.$("#reportTable thead tr").append("<th>" + mileStone + "</th>");
     });
-
-    gadget.resize();
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
@@ -108,9 +135,6 @@ function consolidateFutureEffort(issues) {
             return 0;
         });
 
-        var currentSum = 0;
-
-
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed";
@@ -121,8 +145,7 @@ function consolidateFutureEffort(issues) {
                     contentType: 'application/json',
                     dataType: "json",
                     success: function (data) {
-                        currentSum += calculateRemainingEstimateForMileStone(data.issues);
-                        AJS.$("#" + currentTeam + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
+                        calculateRemainingEstimateForMileStone(currentTeam, mileStone, data.issues);
                     }
                 });
             }
@@ -130,7 +153,20 @@ function consolidateFutureEffort(issues) {
     });
 }
 
-function calculateRemainingEstimateForMileStone(issues) {
+function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
+    var sum = 0;
+    AJS.$.each(issues, function (index, issue) {
+        var label = _.find(issue.fields.labels, function (label) {
+            return _.contains(selectedMilestoneLabels, label);
+        });
+        if (label && label !== mileStone) {
+            sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
+        } else {
+            sumPerMileStone[team][mileStone] += issue.fields.timeoriginalestimate;
+        }
+    });
+
+
     var onlyFields = _.pluck(issues, "fields");
     var onlyEstimate = _.pluck(onlyFields, "timeoriginalestimate");
     return _.reduce(onlyEstimate, function (memo, num) {
