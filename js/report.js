@@ -48,7 +48,7 @@ function startReportGeneration() {
     AJS.$.each(teams, function (index, team) {
         for (var i = numberOfWeeksInThePast; i > 0; i--) {
             AJS.$("#" + team).append('<td id="past' + i + '"></td>');
-            var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and resolutiondate >=-" + i + "w";
+            var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and (resolutiondate >=-" + i + "w or status=R4Review)";
             ajaxCallUnique(url, team, i, consolidatePastEffort);
         }
     });
@@ -90,6 +90,14 @@ function resetTable() {
     }
 
     selectedMilestoneLabels = AJS.$('#labelChooser').val().split(",");
+
+
+    selectedMilestoneLabels.sort(function (a, b) {
+        if (parseInt(a.slice(1)) > parseInt(b.slice(1))) return 1;
+        if (parseInt(a.slice(1)) < parseInt(b.slice(1))) return -1;
+        return 0;
+    });
+
     AJS.$.each(teams, function (index, team) {
         sumPerMileStone[team] = {};
         AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
