@@ -152,7 +152,7 @@ function consolidateFutureEffort(issues) {
 
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
-                var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed";
+                var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and (status != Closed or status != R4Review)";
 
                 AJS.$.ajax({
                     url: getIssuesForEpicsUrl,
