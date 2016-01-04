@@ -51,7 +51,11 @@ function startReportGeneration() {
             var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and (resolutiondate >=-" + i + "w or status=R4Review)";
             ajaxCallUnique(url, team, i, consolidatePastEffort);
         }
+        
+        AJS.$("#" + team).append('<td id="zero">0</td>');
     });
+    
+    
 
     AJS.$(document).ajaxStop(function () {
         AJS.$.each(teams, function (index, team) {
