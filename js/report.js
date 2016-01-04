@@ -92,6 +92,7 @@ function resetTable() {
     for (var i = numberOfWeeksInThePast; i > 0; i--) {
         AJS.$("#reportTable thead tr").append("<th>-" + i + "</th>");
     }
+     AJS.$("#reportTable thead tr").append("<th>0</th>");
 
     selectedMilestoneLabels = AJS.$('#labelChooser').val().split(",");
 
