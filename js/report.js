@@ -80,16 +80,17 @@ function startReportGeneration() {
             });
             var object = {}
             for (var i = 25; i >= 0; i--) {
-                object[i] = [];
+                var currentIndex = -24 + i;
+                object[currentIndex] = [];
                 if (currentMilestoneMainRelease >= 0) {
-                    object[i].push("R-" + currentMilestoneMainRelease);
+                    object[currentIndex].push("R-" + currentMilestoneMainRelease);
                 } else if (currentMilestoneMainRelease === -1) {
-                    object[i].push("R+1");
+                    object[currentIndex].push("R+1");
                 }
                 if (currentMilestoneNextRelease >= 0) {
-                    object[i].push("R-" + currentMilestoneNextRelease);
+                    object[currentIndex].push("R-" + currentMilestoneNextRelease);
                 } else if (currentMilestoneNextRelease === -1) {
-                    object[i].push("R+1");
+                    object[currentIndex].push("R+1");
                 }
 
                 currentMilestoneMainRelease--;
