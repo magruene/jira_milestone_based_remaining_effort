@@ -70,13 +70,13 @@ function startReportGeneration() {
                 if (!version.released && version.name === AJS.$("#versionChooserMain").val()) {
                     var nextRelease = new Date(version.releaseDate);
                     nextRelease.setDate(nextRelease.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
-                    currentMilestoneMainRelease = nextRelease.getWeekNumber() - today.getWeekNumber() - 1;
+                    currentMilestoneMainRelease = nextRelease.getWeekNumber() - today.getWeekNumber();
                     console.log("We are at " + currentMilestoneMainRelease + " for the next release");
                 }
                 if (!version.released && version.name === AJS.$("#versionChooserMainSecond").val()) {
                     var futureRelease = new Date(version.releaseDate);
                     futureRelease.setDate(futureRelease.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
-                    currentMilestoneNextRelease = futureRelease.getWeekNumber() - today.getWeekNumber() - 1;
+                    currentMilestoneNextRelease = futureRelease.getWeekNumber() - today.getWeekNumber();
                     console.log("We are at " + currentMilestoneNextRelease + " for the future release");
                 }
             });
