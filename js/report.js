@@ -78,19 +78,18 @@ function startReportGeneration() {
                     console.log("We are at " + currentMilestoneNextRelease + " for the future release");
                 }
             });
-            var object = {}
-            for (var i = 25; i >= 0; i--) {
-                var currentIndex = -24 + i;
-                object[currentIndex] = [];
+            var object = {};
+            for (var i = 1; i <= 25; i--) {
+                object[i] = [];
                 if (currentMilestoneMainRelease >= 0) {
-                    object[currentIndex].push("R-" + currentMilestoneMainRelease);
+                    object[i].push("R-" + currentMilestoneMainRelease);
                 } else if (currentMilestoneMainRelease === -1) {
-                    object[currentIndex].push("R+1");
+                    object[i].push("R+1");
                 }
                 if (currentMilestoneNextRelease >= 0) {
-                    object[currentIndex].push("R-" + currentMilestoneNextRelease);
+                    object[i].push("R-" + currentMilestoneNextRelease);
                 } else if (currentMilestoneNextRelease === -1) {
-                    object[currentIndex].push("R+1");
+                    object[i].push("R+1");
                 }
 
                 currentMilestoneMainRelease--;
