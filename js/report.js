@@ -3,8 +3,11 @@ var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     numberOfWeeksInThePast = 8,
     selectedMilestoneLabels,
     sumPerMileStone = {},
+    currentMilestone,
     onJira;
 
+
+// http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
 Date.prototype.getWeekNumber = function () {
     var d = new Date(+this);
     d.setMilliseconds(0)
@@ -47,6 +50,7 @@ function init() {
                 if (!version.released) {
                     AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>")
                     AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>")
+                    AJS.$("#versionChooserMainSecond").append("<option value='" + version.name + "'>" + version.name + "</option>")
                 }
             });
             AJS.$("button").click(startReportGeneration);
@@ -55,6 +59,23 @@ function init() {
 }
 
 function startReportGeneration() {
+    AJS.$.ajax({
+        url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
+        contentType: 'application/json',
+        dataType: "json",
+        success: function (data) {
+            AJS.$.each(data, function (index, version) {
+                if (!version.released && version.name === AJS.$("#versionChooserMain").val()) {
+                    var today = new Date();
+                    var nextRelease = new Date(version.releaseDate);
+                    currentMilestone = "R-" + (nextRelease.getWeekNumber() - today.getWeekNumber());
+                    console.log("We are at " + currentMilestone);
+                }
+            });
+            AJS.$("button").click(startReportGeneration);
+        }
+    });
+
     resetTable();
 
     var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "')";
