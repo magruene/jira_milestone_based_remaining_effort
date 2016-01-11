@@ -83,12 +83,12 @@ function startReportGeneration() {
                 object[i] = [];
                 if (currentMilestoneMainRelease >= 0) {
                     object[i].push("R-" + currentMilestoneMainRelease);
-                } else if (currentMilestoneMainRelease === 1) {
+                } else if (currentMilestoneMainRelease === -1) {
                     object[i].push("R+1");
                 }
                 if (currentMilestoneNextRelease >= 0) {
                     object[i].push("R-" + currentMilestoneNextRelease);
-                } else if (currentMilestoneNextRelease === 1) {
+                } else if (currentMilestoneNextRelease === -1) {
                     object[i].push("R+1");
                 }
 
