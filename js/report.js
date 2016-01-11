@@ -16,7 +16,7 @@ Date.prototype.getWeekNumber = function () {
 var date = new Date();
 console.log(date.getWeekNumber());
 var release = new Date("2016-02-22");
-console.log(release.getWeekNumber);
+console.log(release.getWeekNumber());
 console.log("we are at R-" + release.getWeekNumber() - date.getWeekNumber())
 
 //if not on jira, we need to initialize this.
