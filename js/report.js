@@ -3,7 +3,8 @@ var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     numberOfWeeksInThePast = 8,
     selectedMilestoneLabels,
     sumPerMileStone = {},
-    currentMilestone,
+    currentMilestoneMainRelease,
+    currentMilestoneNextRelease,
     onJira;
 
 
@@ -64,12 +65,17 @@ function startReportGeneration() {
         contentType: 'application/json',
         dataType: "json",
         success: function (data) {
+            var today = new Date();
             AJS.$.each(data, function (index, version) {
                 if (!version.released && version.name === AJS.$("#versionChooserMain").val()) {
-                    var today = new Date();
                     var nextRelease = new Date(version.releaseDate);
-                    currentMilestone = "R-" + (nextRelease.getWeekNumber() - today.getWeekNumber());
-                    console.log("We are at " + currentMilestone);
+                    currentMilestoneMainRelease = "R-" + (nextRelease.getWeekNumber() - today.getWeekNumber());
+                    console.log("We are at " + currentMilestoneMainRelease + " for the next release");
+                }
+                if (!version.released && version.name === AJS.$("#versionChooserMainSecond").val()) {
+                    var futureRelease = new Date(version.releaseDate);
+                    currentMilestoneNextRelease = "R-" + (futureRelease.getWeekNumber() - today.getWeekNumber());
+                    console.log("We are at " + currentMilestoneNextRelease + " for the future release");
                 }
             });
             AJS.$("button").click(startReportGeneration);
