@@ -31,7 +31,8 @@ function init() {
         success: function (data) {
             AJS.$.each(data, function (index, version) {
                 if (!version.released) {
-                    AJS.$("#versionChooser").append("<option value='" + version.name + "'>" + version.name + "</option>")
+                    AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>")
+                    AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>")
                 }
             });
             AJS.$("button").click(startReportGeneration);
@@ -42,7 +43,7 @@ function init() {
 function startReportGeneration() {
     resetTable();
 
-    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion='" + AJS.$("#versionChooser").val() + "'";
+    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', " + AJS.$("#versionChooserSmall").val() + "'";
     ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
     AJS.$.each(teams, function (index, team) {
