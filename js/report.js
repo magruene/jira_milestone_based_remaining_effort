@@ -49,9 +49,9 @@ function init() {
         success: function (data) {
             AJS.$.each(data, function (index, version) {
                 if (!version.released) {
-                    AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>")
-                    AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>")
-                    AJS.$("#versionChooserMainSecond").append("<option value='" + version.name + "'>" + version.name + "</option>")
+                    AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>");
+                    AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>");
+                    AJS.$("#versionChooserMainSecond").append("<option value='" + version.name + "'>" + version.name + "</option>");
                 }
             });
             AJS.$("button").click(startReportGeneration);
@@ -69,54 +69,69 @@ function startReportGeneration() {
             AJS.$.each(data, function (index, version) {
                 if (!version.released && version.name === AJS.$("#versionChooserMain").val()) {
                     var nextRelease = new Date(version.releaseDate);
-                    currentMilestoneMainRelease = "R-" + (nextRelease.getWeekNumber() - today.getWeekNumber());
+                    currentMilestoneMainRelease = nextRelease.getWeekNumber() - today.getWeekNumber() - 1;
                     console.log("We are at " + currentMilestoneMainRelease + " for the next release");
                 }
                 if (!version.released && version.name === AJS.$("#versionChooserMainSecond").val()) {
                     var futureRelease = new Date(version.releaseDate);
-                    currentMilestoneNextRelease = "R-" + (futureRelease.getWeekNumber() - today.getWeekNumber());
+                    currentMilestoneNextRelease = futureRelease.getWeekNumber() - today.getWeekNumber() - 1;
                     console.log("We are at " + currentMilestoneNextRelease + " for the future release");
                 }
             });
-            AJS.$("button").click(startReportGeneration);
-        }
-    });
+            var object = {}
+            for (var i = 25; i >= 0; i--) {
+                object[i] = [];
+                if (currentMilestoneMainRelease >= 0) {
+                    object[i].push("R-" + currentMilestoneMainRelease);
+                } else if (currentMilestoneMainRelease === 1) {
+                    object[i].push("R+1");
+                }
+                if (currentMilestoneNextRelease >= 0) {
+                    object[i].push("R-" + currentMilestoneNextRelease);
+                } else if (currentMilestoneNextRelease === 1) {
+                    object[i].push("R+1");
+                }
 
-    resetTable();
+                currentMilestoneMainRelease--;
+                currentMilestoneNextRelease--;
+            }
+            console.log(object);
 
-    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "')";
-    ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
+            resetTable();
 
-    AJS.$.each(teams, function (index, team) {
-        for (var i = numberOfWeeksInThePast; i > 0; i--) {
-            AJS.$("#" + team).append('<td id="past' + i + '"></td>');
-            var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and (resolutiondate >=-" + i + "w or status=R4Review)";
-            ajaxCallUnique(url, team, i, consolidatePastEffort);
-        }
-        
-        AJS.$("#" + team).append('<td id="zero">0</td>');
-    });
-    
-    
+            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
+            ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
-    AJS.$(document).ajaxStop(function () {
-        AJS.$.each(teams, function (index, team) {
-            var currentSum = 0;
-            AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-                currentSum += sumPerMileStone[team][mileStone];
+            AJS.$.each(teams, function (index, team) {
+                for (var i = numberOfWeeksInThePast; i > 0; i--) {
+                    AJS.$("#" + team).append('<td id="past' + i + '"></td>');
+                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and (resolutiondate >=-" + i + "w or status=R4Review)";
+                    ajaxCallUnique(url, team, i, consolidatePastEffort);
+                }
 
-                if (sumPerMileStone[team][mileStone] > 0) {
-                    AJS.$("#" + team + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
-                } else {
-                    AJS.$("#" + team + " #" + mileStone).text(0);
+                AJS.$("#" + team).append('<td id="zero">0</td>');
+            });
+
+
+            AJS.$(document).ajaxStop(function () {
+                AJS.$.each(teams, function (index, team) {
+                    var currentSum = 0;
+                    AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
+                        currentSum += sumPerMileStone[team][mileStone];
+
+                        if (sumPerMileStone[team][mileStone] > 0) {
+                            AJS.$("#" + team + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
+                        } else {
+                            AJS.$("#" + team + " #" + mileStone).text(0);
+                        }
+                    });
+                });
+                if (onJira) {
+                    gadget.resize();
                 }
             });
-        });
-        if (onJira) {
-            gadget.resize();
         }
     });
-
 }
 
 function resetTable() {
