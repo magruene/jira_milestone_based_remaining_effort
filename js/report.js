@@ -79,7 +79,7 @@ function startReportGeneration() {
                 }
             });
             var object = {};
-            for (var i = 1; i <= 25; i--) {
+            for (var i = 1; i <= 25; i++) {
                 object[i] = [];
                 if (currentMilestoneMainRelease >= 0) {
                     object[i].push("R-" + currentMilestoneMainRelease);
