@@ -136,7 +136,18 @@ function consolidateFutureEffort(issues) {
         var issueGroup = groupedIssuesByTeam[currentTeam];
 
         var groupedIssuesByMileStone = _.groupBy(issueGroup, function (issue) {
-            var label = _.find(issue.fields.labels, function (label) {
+            var label;
+            AJS.$.each(issue.fields.fixVersions, function (index, fixVersion) {
+                if (fixVersion.name === AJS.$("#versionChooserSmall").val()) {
+                    label = AJS.$("#mainReleaseMS").val();
+                }
+            });
+
+            if (label) {
+                return label;
+            }
+
+            label = _.find(issue.fields.labels, function (label) {
                 return _.contains(selectedMilestoneLabels, label);
             });
             if (label != undefined) {
