@@ -5,6 +5,20 @@ var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     sumPerMileStone = {},
     onJira;
 
+Date.prototype.getWeekNumber = function () {
+    var d = new Date(+this);
+    d.setMilliseconds(0)
+    d.setHours(0, 0, 0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
+};
+
+var date = new Date();
+console.log(date.getWeekNumber());
+var release = new Date("2016-02-22");
+console.log(release.getWeekNumber);
+console.log("we are at R-" + release.getWeekNumber() - date.getWeekNumber())
+
 //if not on jira, we need to initialize this.
 if (!AJS) {
     onJira = false;
