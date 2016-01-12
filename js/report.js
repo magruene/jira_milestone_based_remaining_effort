@@ -281,7 +281,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 
         //This is work that still has to be done even though the milestone is in the past
         if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val()) {
-            console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
+            console.log("Issue with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
             label = "" + 1;
         }
 
