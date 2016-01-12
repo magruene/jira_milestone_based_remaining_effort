@@ -279,12 +279,6 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 
         });
 
-        //This is work that still has to be done even though the milestone is in the past
-        if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.timeoriginalestimate > 0) {
-            console.log("Issue with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work: " + Math.round((issue.fields.timeoriginalestimate / 28800) * 100) / 100);
-            label = "" + 1;
-        }
-
         if (label && label !== mileStone) {
             sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
         } else {
