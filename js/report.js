@@ -163,7 +163,7 @@ function consolidatePastEffort(team, weeksInThePast, issues) {
 function consolidateFutureEffort(issues) {
 
     var groupedIssuesByTeam = _.groupBy(issues, function (issue) {
-        return issue.fields.customfield_14850.value;
+        return issue.fields.customfield_14850.value; //Team
     });
 
 
@@ -207,6 +207,7 @@ function consolidateFutureEffort(issues) {
 
                 //This is work that still has to be done even though the milestone is in the past
                 if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val()) {
+                    console.log("Issue with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
                     label = "" + 1;
                 }
 
