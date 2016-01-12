@@ -106,7 +106,6 @@ function startReportGeneration() {
                 AJS.$.each(teams, function (index, team) {
                     var currentSum = 0;
                     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-                        console.log(team, sumPerMileStone[team][mileStone]);
                         currentSum += sumPerMileStone[team][mileStone];
 
                         if (sumPerMileStone[team][mileStone] > 0) {
