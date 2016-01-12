@@ -191,10 +191,9 @@ function consolidateFutureEffort(issues) {
                 console.log("Current label is: " + currentLabel);
                 AJS.$.each(object, function (index, futureWeek) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
-                        console.log("Have main issue while looking for: " + futureWeek[0]);
                         if (futureWeek[0] === currentLabel) {
                             label = index + 1;
-                            console.log("add " + currentLabel + " to object " + object[index + 1])
+                            console.log("add " + currentLabel + " to object with index " + index + ": " + object[index + 1])
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
