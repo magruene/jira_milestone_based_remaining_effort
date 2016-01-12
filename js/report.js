@@ -284,6 +284,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
         } else {
             sumPerMileStone[team][mileStone] += issue.fields.timeoriginalestimate;
         }
+        console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + sumPerMileStone[team][mileStone])
     });
 
 
