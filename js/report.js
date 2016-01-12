@@ -154,7 +154,7 @@ function resetTable() {
     });
 
     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-        AJS.$("#reportTable thead tr").append("<th>" + object[mileStone] + "</th>");
+        AJS.$("#reportTable thead tr").append("<th>+" + mileStone + "</th>");
     });
 }
 
