@@ -7,6 +7,8 @@ var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     currentMilestoneNextRelease,
     onJira;
 
+var object = {};
+
 
 // http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
 Date.prototype.getWeekNumber = function () {
@@ -80,7 +82,6 @@ function startReportGeneration() {
                     console.log("We are at " + currentMilestoneNextRelease + " for the future release");
                 }
             });
-            var object = {};
             for (var i = 1; i <= 25; i++) {
                 object[i] = [];
                 if (currentMilestoneMainRelease >= 0) {
@@ -101,13 +102,13 @@ function startReportGeneration() {
 
             resetTable();
 
-            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed or status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
+            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed and status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
             ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
             AJS.$.each(teams, function (index, team) {
                 for (var i = numberOfWeeksInThePast; i > 0; i--) {
                     AJS.$("#" + team).append('<td id="past' + i + '"></td>');
-                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and (resolutiondate >=-" + i + "w or status=R4Review)";
+                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and ((resolutiondate >=-" + i + "w and resolution=Done) or (status=R4Review and status changed to R4Review after -" + i + "w))";
                     ajaxCallUnique(url, team, i, consolidatePastEffort);
                 }
 
@@ -194,25 +195,32 @@ function consolidateFutureEffort(issues) {
         var issueGroup = groupedIssuesByTeam[currentTeam];
 
         var groupedIssuesByMileStone = _.groupBy(issueGroup, function (issue) {
-            var label;
-            AJS.$.each(issue.fields.fixVersions, function (index, fixVersion) {
-                if (fixVersion.name === AJS.$("#versionChooserSmall").val()) {
-                    label = AJS.$("#mainReleaseMS").val();
-                }
+            var label,
+                fixVersion;
+            AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
+                fixVersion = currentFixVersion.name;
             });
 
-            if (label) {
-                return label;
+            if (fixVersion === AJS.$("#versionChooserSmall").val()) {
+                return AJS.$("#mainReleaseMS").val();
             }
 
-            label = _.find(issue.fields.labels, function (label) {
-                return _.contains(selectedMilestoneLabels, label);
-            });
-            if (label != undefined) {
+            AJS.$.each(issue.fields.labels, function (currentLabel) {
+                AJS.$.each(object, function (index, futureWeek) {
+                    if (fixVersion === AJS.$("#versionChooserMain").val()) {
+                        if (futureWeek[0] === currentLabel) {
+                            label = futureWeek;
+                        }
+                    }
+                    if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
+                        if (futureWeek[1] === currentLabel) {
+                            label = futureWeek;
+                        }
+                    }
+                });
                 return label;
-            } else {
+            });
                 return "NotSpecified";
-            }
         });
 
         var sortable = [];
