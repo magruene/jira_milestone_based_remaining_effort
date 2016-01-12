@@ -193,12 +193,12 @@ function consolidateFutureEffort(issues) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
                         console.log("Have main issue while looking for: " + futureWeek[0]);
                         if (futureWeek[0] === currentLabel) {
-                            label = futureWeek;
+                            label = index+1;
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
                         if (futureWeek[1] === currentLabel) {
-                            label = futureWeek;
+                            label = index+1;
                         }
                     }
                 });
