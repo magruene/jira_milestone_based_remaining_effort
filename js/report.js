@@ -153,7 +153,7 @@ function resetTable() {
     });
 
     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-        AJS.$("#reportTable thead tr").append("<th>+" + mileStone + "</th>");
+        AJS.$("#reportTable thead tr").append("<th>" + object[mileStone] + "</th>");
     });
 }
 
@@ -201,7 +201,7 @@ function consolidateFutureEffort(issues) {
                             if (futureWeek[1] === currentLabel) {
                                 label = "" + index;
                             }
-                        } else if(futureWeek.length === 1) {
+                        } else if (futureWeek.length === 1) {
                             if (futureWeek[0] === currentLabel) {
                                 label = "" + index;
                             }
