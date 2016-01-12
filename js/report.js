@@ -279,13 +279,16 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 
         });
 
+        if (milestone === "1" && issue.fields.timeoriginalestimate > 0) {
+            console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + Math.round((sumPerMileStone[team][mileStone] / 28800) * 100) / 100)
+        }
+
         if (label && label !== mileStone) {
             sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
         } else {
             sumPerMileStone[team][mileStone] += issue.fields.timeoriginalestimate;
         }
-        if (issue.fields.timeoriginalestimate > 0)
-        console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + Math.round((sumPerMileStone[team][mileStone] / 28800) * 100) / 100)
+
     });
 
 
