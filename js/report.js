@@ -218,9 +218,8 @@ function consolidateFutureEffort(issues) {
                         }
                     }
                 });
-                return label;
             });
-                return "NotSpecified";
+            label = "NotSpecified";
         });
 
         var sortable = [];
