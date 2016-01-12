@@ -209,7 +209,7 @@ function consolidateFutureEffort(issues) {
             });
 
             //This is work that still has to be done even though the milestone is in the past
-            if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.labels ==! "") {
+            if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.labels !=="") {
                 console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
                 label = "" + 1;
             }
