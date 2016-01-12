@@ -110,6 +110,7 @@ function startReportGeneration() {
                         currentSum += sumPerMileStone[team][mileStone];
 
                         if (sumPerMileStone[team][mileStone] > 0) {
+                            console.log(AJS.$("#" + team + " #" + mileStone))
                             AJS.$("#" + team + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
                         } else {
                             AJS.$("#" + team + " #" + mileStone).text(0);
