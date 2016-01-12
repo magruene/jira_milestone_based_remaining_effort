@@ -219,7 +219,11 @@ function consolidateFutureEffort(issues) {
                     }
                 });
             });
-            label = "NotSpecified";
+            if (label != undefined) {
+                return label;
+            } else {
+                return "NotSpecified";
+            }
         });
 
         var sortable = [];
