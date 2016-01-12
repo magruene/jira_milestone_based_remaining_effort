@@ -84,7 +84,6 @@ function startReportGeneration() {
                 currentMilestoneMainRelease--;
                 currentMilestoneNextRelease--;
             }
-            console.log(object);
 
             resetTable();
 
@@ -109,7 +108,6 @@ function startReportGeneration() {
                         currentSum += sumPerMileStone[team][mileStone];
 
                         if (sumPerMileStone[team][mileStone] > 0) {
-                            console.log(AJS.$("#" + team + " #future" + mileStone))
                             AJS.$("#" + team + " #future" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
                         } else {
                             AJS.$("#" + team + " #future" + mileStone).text(0);
@@ -188,12 +186,10 @@ function consolidateFutureEffort(issues) {
             }
 
             AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
-                console.log("Current label is: " + currentLabel);
                 AJS.$.each(object, function (index, futureWeek) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
                         if (futureWeek.length === 2 && futureWeek[0] === currentLabel) {
                             label = "" + index;
-                            console.log("add " + currentLabel + " to object with index " + index + ": " + object["" + index])
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
@@ -208,15 +204,19 @@ function consolidateFutureEffort(issues) {
                         }
                     }
                 });
+
+                //This is work that still has to be done even though the milestone is in the past
+                if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val()) {
+                    label = "" + 1;
+                }
+
             });
-            if (label != undefined) {
+            if (label !== undefined) {
                 return label;
             } else {
                 return "NotSpecified";
             }
         });
-
-        console.log(groupedIssuesByMileStone);
 
         var sortable = [];
         for (var mileStone in groupedIssuesByMileStone) {
@@ -227,8 +227,6 @@ function consolidateFutureEffort(issues) {
             if (a > b) return -1;
             return 0;
         });
-
-        console.log(sortable);
 
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
@@ -258,12 +256,10 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
         });
 
         AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
-            console.log("Current label is: " + currentLabel);
             AJS.$.each(object, function (index, futureWeek) {
                 if (fixVersion === AJS.$("#versionChooserMain").val()) {
                     if (futureWeek.length === 2 && futureWeek[0] === currentLabel) {
                         label = "" + index;
-                        console.log("add " + currentLabel + " to object with index " + index + ": " + object["" + index])
                     }
                 }
                 if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
@@ -278,6 +274,11 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
                     }
                 }
             });
+
+            //This is work that still has to be done even though the milestone is in the past
+            if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val()) {
+                label = "" + 1;
+            }
         });
 
         if (label && label !== mileStone) {
