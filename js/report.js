@@ -194,7 +194,7 @@ function consolidateFutureEffort(issues) {
                         console.log("Have main issue while looking for: " + futureWeek[0]);
                         if (futureWeek[0] === currentLabel) {
                             label = index + 1;
-                            console.log("add " + currentLabel + " to object " + object[index+1])
+                            console.log("add " + currentLabel + " to object " + object[index + 1])
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
@@ -210,6 +210,8 @@ function consolidateFutureEffort(issues) {
                 return "NotSpecified";
             }
         });
+
+        console.log(groupedIssuesByMileStone);
 
         var sortable = [];
         for (var mileStone in groupedIssuesByMileStone) {
