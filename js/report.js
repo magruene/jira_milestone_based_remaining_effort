@@ -233,6 +233,8 @@ function consolidateFutureEffort(issues) {
             return 0;
         });
 
+        console.log(sortable);
+
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review";
