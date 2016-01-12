@@ -141,7 +141,7 @@ function resetTable() {
      AJS.$("#reportTable thead tr").append("<th>0</th>");
 
     selectedMilestoneLabels = [];
-    for(var i = 1; i<=25; i++) {
+    for (var i = 1; i <= 25; i++) {
         selectedMilestoneLabels.push(i);
     }
 
@@ -188,8 +188,10 @@ function consolidateFutureEffort(issues) {
             }
 
             AJS.$.each(issue.fields.labels, function (currentLabel) {
+                console.log("Current label is: " + currentLabel);
                 AJS.$.each(object, function (index, futureWeek) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
+                        console.log("Have main issue while looking for: " + futureWeek[0]);
                         if (futureWeek[0] === currentLabel) {
                             label = futureWeek;
                         }
