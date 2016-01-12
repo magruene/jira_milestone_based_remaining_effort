@@ -106,6 +106,7 @@ function startReportGeneration() {
                 AJS.$.each(teams, function (index, team) {
                     var currentSum = 0;
                     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
+                        console.log(team, sumPerMileStone[team][mileStone]);
                         currentSum += sumPerMileStone[team][mileStone];
 
                         if (sumPerMileStone[team][mileStone] > 0) {
@@ -138,7 +139,7 @@ function resetTable() {
     for (var i = numberOfWeeksInThePast; i > 0; i--) {
         AJS.$("#reportTable thead tr").append("<th>-" + i + "</th>");
     }
-     AJS.$("#reportTable thead tr").append("<th>0</th>");
+    AJS.$("#reportTable thead tr").append("<th>0</th>");
 
     selectedMilestoneLabels = [];
     for (var i = 1; i <= 25; i++) {
@@ -177,8 +178,7 @@ function consolidateFutureEffort(issues) {
         var issueGroup = groupedIssuesByTeam[currentTeam];
 
         var groupedIssuesByMileStone = _.groupBy(issueGroup, function (issue) {
-            var label,
-                fixVersion;
+            var label, fixVersion;
             AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
                 fixVersion = currentFixVersion.name;
             });
@@ -257,9 +257,6 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
             fixVersion = currentFixVersion.name;
         });
 
-        if (fixVersion === AJS.$("#versionChooserSmall").val()) {
-            return AJS.$("#mainReleaseMS").val();
-        }
         AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
             console.log("Current label is: " + currentLabel);
             AJS.$.each(object, function (index, futureWeek) {
