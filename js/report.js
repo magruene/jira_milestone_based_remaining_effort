@@ -197,8 +197,14 @@ function consolidateFutureEffort(issues) {
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
-                        if (futureWeek[1] === currentLabel) {
-                            label = "" + index;
+                        if (futureWeek.length === 2) {
+                            if (futureWeek[1] === currentLabel) {
+                                label = "" + index;
+                            }
+                        } else if(futureWeek.length === 1) {
+                            if (futureWeek[0] === currentLabel) {
+                                label = "" + index;
+                            }
                         }
                     }
                 });
