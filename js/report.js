@@ -1,4 +1,4 @@
-var teams = ["Skipper"],
+var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
     possibleMilestoneLabels = ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
     numberOfWeeksInThePast = 8,
     selectedMilestoneLabels,
@@ -87,7 +87,7 @@ function startReportGeneration() {
 
             resetTable();
 
-            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper) and (status != Closed and status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
+            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed and status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
             ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
             AJS.$.each(teams, function (index, team) {
