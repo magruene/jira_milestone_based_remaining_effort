@@ -109,10 +109,10 @@ function startReportGeneration() {
                         currentSum += sumPerMileStone[team][mileStone];
 
                         if (sumPerMileStone[team][mileStone] > 0) {
-                            console.log(AJS.$("#" + team + " #" + mileStone))
-                            AJS.$("#" + team + " #" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
+                            console.log(AJS.$("#" + team + " #future" + mileStone))
+                            AJS.$("#" + team + " #future" + mileStone).text(Math.round((currentSum / 28800) * 100) / 100);
                         } else {
-                            AJS.$("#" + team + " #" + mileStone).text(0);
+                            AJS.$("#" + team + " #future" + mileStone).text(0);
                         }
                     });
                 });
@@ -171,8 +171,8 @@ function consolidateFutureEffort(issues) {
 
     AJS.$.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
         AJS.$.each(selectedMilestoneLabels, function (index, mileStoneLabel) {
-            AJS.$("#" + currentTeam).append('<td id="' + mileStoneLabel + '"></td>');
-            AJS.$("#" + currentTeam + " #" + mileStoneLabel).text("0");
+            AJS.$("#" + currentTeam).append('<td id="future' + mileStoneLabel + '"></td>');
+            AJS.$("#" + currentTeam + " #future" + mileStoneLabel).text("0");
         });
 
         var issueGroup = groupedIssuesByTeam[currentTeam];
