@@ -187,18 +187,19 @@ function consolidateFutureEffort(issues) {
                 return AJS.$("#mainReleaseMS").val();
             }
 
-            AJS.$.each(issue.fields.labels, function (index, currentLabel) {
+            AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
                 console.log("Current label is: " + currentLabel);
                 AJS.$.each(object, function (index, futureWeek) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
                         console.log("Have main issue while looking for: " + futureWeek[0]);
                         if (futureWeek[0] === currentLabel) {
-                            label = index+1;
+                            label = index + 1;
+                            console.log("add " + currentLabel + " to object " + object[index+1])
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
                         if (futureWeek[1] === currentLabel) {
-                            label = index+1;
+                            label = index + 1;
                         }
                     }
                 });
@@ -291,37 +292,6 @@ function calculateIssueSum(issues) {
     });
 
     return Math.round(sumEstimate * 100) / 100;
-}
-
-/* For a given date, get the ISO week number
- *
- * Based on information at:
- *
- *    http://www.merlyn.demon.co.uk/weekcalc.htm#WNR
- *
- * Algorithm is to find nearest thursday, it's year
- * is the year of the week number. Then get weeks
- * between that date and the first day of that year.
- *
- * Note that dates in one year can be weeks of previous
- * or next year, overlap is up to 3 days.
- *
- * e.g. 2014/12/29 is Monday in week  1 of 2015
- *      2012/1/1   is Sunday in week 52 of 2011
- */
-function getWeekNumber(d) {
-    // Copy date so don't modify original
-    d = new Date(+d);
-    d.setHours(0, 0, 0);
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-    // Get first day of year
-    var yearStart = new Date(d.getFullYear(), 0, 1);
-    // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1) / 7);
-    // Return array of year and week number
-    return [d.getFullYear(), weekNo];
 }
 
 var Report = {};
