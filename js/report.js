@@ -279,7 +279,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 
         });
 
-        if (milestone === "1" && issue.fields.timeoriginalestimate > 0) {
+        if (mileStone === "1" && issue.fields.timeoriginalestimate > 0) {
             console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + Math.round((sumPerMileStone[team][mileStone] / 28800) * 100) / 100)
         }
 
