@@ -193,7 +193,7 @@ function consolidateFutureEffort(issues) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
                         if (futureWeek[0] === currentLabel) {
                             label = index + 1;
-                            console.log("add " + currentLabel + " to object with index " + index + ": " + object[index + 1])
+                            console.log("add " + currentLabel + " to object with index " + index + ": " + object["" + index])
                         }
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
