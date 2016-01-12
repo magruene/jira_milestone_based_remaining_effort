@@ -187,7 +187,7 @@ function consolidateFutureEffort(issues) {
                 return AJS.$("#mainReleaseMS").val();
             }
 
-            AJS.$.each(issue.fields.labels, function (currentLabel) {
+            AJS.$.each(issue.fields.labels, function (index, currentLabel) {
                 console.log("Current label is: " + currentLabel);
                 AJS.$.each(object, function (index, futureWeek) {
                     if (fixVersion === AJS.$("#versionChooserMain").val()) {
