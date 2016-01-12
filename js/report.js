@@ -210,7 +210,6 @@ function consolidateFutureEffort(issues) {
 
             //This is work that still has to be done even though the milestone is in the past
             if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.labels.length > 0) {
-                console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
                 label = "" + 1;
             }
             if (label !== undefined) {
@@ -278,10 +277,6 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
             });
 
         });
-
-        if (mileStone === "1" && issue.fields.timeoriginalestimate > 0) {
-            console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + Math.round((sumPerMileStone[team][mileStone] / 28800) * 100) / 100)
-        }
 
         if (label && label !== mileStone) {
             sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
