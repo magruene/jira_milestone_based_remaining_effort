@@ -251,9 +251,38 @@ function consolidateFutureEffort(issues) {
 function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
     var sum = 0;
     AJS.$.each(issues, function (index, issue) {
-        var label = _.find(issue.fields.labels, function (label) {
-            return _.contains(selectedMilestoneLabels, label);
+        var label, fixVersion;
+
+        AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
+            fixVersion = currentFixVersion.name;
         });
+
+        if (fixVersion === AJS.$("#versionChooserSmall").val()) {
+            return AJS.$("#mainReleaseMS").val();
+        }
+        AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
+            console.log("Current label is: " + currentLabel);
+            AJS.$.each(object, function (index, futureWeek) {
+                if (fixVersion === AJS.$("#versionChooserMain").val()) {
+                    if (futureWeek.length === 2 && futureWeek[0] === currentLabel) {
+                        label = "" + index;
+                        console.log("add " + currentLabel + " to object with index " + index + ": " + object["" + index])
+                    }
+                }
+                if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
+                    if (futureWeek.length === 2) {
+                        if (futureWeek[1] === currentLabel) {
+                            label = "" + index;
+                        }
+                    } else if (futureWeek.length === 1) {
+                        if (futureWeek[0] === currentLabel) {
+                            label = "" + index;
+                        }
+                    }
+                }
+            });
+        });
+
         if (label && label !== mileStone) {
             sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
         } else {
