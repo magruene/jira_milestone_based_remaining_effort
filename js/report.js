@@ -19,12 +19,6 @@ Date.prototype.getWeekNumber = function () {
     return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
 };
 
-var date = new Date();
-console.log(date.getWeekNumber());
-var release = new Date("2016-02-22");
-console.log(release.getWeekNumber());
-console.log("we are at R-" + (release.getWeekNumber() - date.getWeekNumber()))
-
 //if not on jira, we need to initialize this.
 if (!AJS) {
     onJira = false;
@@ -36,14 +30,6 @@ if (!AJS) {
 
 
 function init() {
-    AJS.$('#labelChooser').val(possibleMilestoneLabels.join(", "));
-
-    AJS.$('#labelChooser').select2({
-        // specify tags
-        tags: possibleMilestoneLabels,
-        width: "100%"
-    });
-
     AJS.$.ajax({
         url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
         contentType: 'application/json',
@@ -154,14 +140,10 @@ function resetTable() {
     }
      AJS.$("#reportTable thead tr").append("<th>0</th>");
 
-    selectedMilestoneLabels = AJS.$('#labelChooser').val().split(",");
-
-
-    selectedMilestoneLabels.sort(function (a, b) {
-        if (parseInt(a.slice(1)) > parseInt(b.slice(1))) return 1;
-        if (parseInt(a.slice(1)) < parseInt(b.slice(1))) return -1;
-        return 0;
-    });
+    selectedMilestoneLabels = [];
+    for(var i = 1; i<=25; i++) {
+        selectedMilestoneLabels.push(i);
+    }
 
     AJS.$.each(teams, function (index, team) {
         sumPerMileStone[team] = {};
@@ -171,7 +153,7 @@ function resetTable() {
     });
 
     AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-        AJS.$("#reportTable thead tr").append("<th>" + mileStone + "</th>");
+        AJS.$("#reportTable thead tr").append("<th>+" + mileStone + "</th>");
     });
 }
 
