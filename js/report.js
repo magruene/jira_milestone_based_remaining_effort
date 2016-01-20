@@ -252,7 +252,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
     var sum = 0;
     AJS.$.each(issues, function (index, issue) {
         var label, fixVersion;
-        var teamForIssue = issue.fields.customfield_14850 || team;
+        var teamForIssue = issue.fields.customfield_14850 != undefined ? issue.fields.customfield_14850.value : team;
 
         AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
             fixVersion = currentFixVersion.name;
