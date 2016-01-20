@@ -182,7 +182,7 @@ function consolidateFutureEffort(issues) {
             });
 
             if (fixVersion === AJS.$("#versionChooserSmall").val()) {
-                return AJS.$("#mainReleaseMS").val();
+                issue.fields.labels = [AJS.$("#mainReleaseMS").val()];
             }
 
             AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
@@ -192,7 +192,7 @@ function consolidateFutureEffort(issues) {
                             label = "" + index;
                         }
                     }
-                    if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
+                    if (fixVersion === AJS.$("#versionChooserMainSecond").val() && fixVersion === AJS.$("#versionChooserSmall").val()) {
                         if (futureWeek.length === 2) {
                             if (futureWeek[1] === currentLabel) {
                                 label = "" + index;
