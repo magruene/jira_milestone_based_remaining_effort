@@ -252,6 +252,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
     var sum = 0;
     AJS.$.each(issues, function (index, issue) {
         var label, fixVersion;
+        var teamForIssue = issue.fields.customfield_14850 || team;
 
         AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
             fixVersion = currentFixVersion.name;
@@ -279,14 +280,10 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 
         });
 
-        if (mileStone === "1" && issue.fields.timeoriginalestimate > 0) {
-            console.log("For issue: " + issue.key + " got remaining: " + issue.fields.timeoriginalestimate + ". Now at " + Math.round((sumPerMileStone[team][mileStone] / 28800) * 100) / 100)
-        }
-
         if (label && label !== mileStone) {
-            sumPerMileStone[team][label] += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][label] += issue.fields.timeoriginalestimate;
         } else {
-            sumPerMileStone[team][mileStone] += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][mileStone] += issue.fields.timeoriginalestimate;
         }
 
     });
