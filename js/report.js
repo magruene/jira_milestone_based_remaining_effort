@@ -192,7 +192,7 @@ function consolidateFutureEffort(issues) {
                             label = "" + index;
                         }
                     }
-                    if (fixVersion === AJS.$("#versionChooserMainSecond").val() && fixVersion === AJS.$("#versionChooserSmall").val()) {
+                    if (fixVersion === AJS.$("#versionChooserMainSecond").val() || fixVersion === AJS.$("#versionChooserSmall").val()) {
                         if (futureWeek.length === 2) {
                             if (futureWeek[1] === currentLabel) {
                                 label = "" + index;
