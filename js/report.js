@@ -166,7 +166,7 @@ function consolidateFutureEffort(issues) {
         return issue.fields.customfield_14850.value; //Team
     });
 
-
+ debugger;
     AJS.$.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
         AJS.$.each(selectedMilestoneLabels, function (index, mileStoneLabel) {
             AJS.$("#" + currentTeam).append('<td id="future' + mileStoneLabel + '"></td>');
