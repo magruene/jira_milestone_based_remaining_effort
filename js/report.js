@@ -161,7 +161,7 @@ function consolidatePastEffort(team, weeksInThePast, issues) {
 }
 
 function consolidateFutureEffort(issues) {
-
+    debugger;
     var groupedIssuesByTeam = _.groupBy(issues, function (issue) {
         return issue.fields.customfield_14850.value; //Team
     });
