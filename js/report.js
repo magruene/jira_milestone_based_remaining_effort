@@ -93,7 +93,7 @@ function startReportGeneration() {
             AJS.$.each(teams, function (index, team) {
                 for (var i = numberOfWeeksInThePast; i > 0; i--) {
                     AJS.$("#" + team).append('<td id="past' + i + '"></td>');
-                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and issuetype=Story and ((resolutiondate >=-" + i + "w and resolution=Done) or (status=R4Review and status changed to R4Review after -" + i + "w))";
+                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and ((resolutiondate >=-" + i + "w and resolution=Done) or (status=R4Review and status changed to R4Review after -" + i + "w))";
                     ajaxCallUnique(url, team, i, consolidatePastEffort);
                 }
 
