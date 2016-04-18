@@ -109,7 +109,7 @@ function startReportGeneration() {
 
                         if (sumPerMileStone[team][mileStone] > 0) {
                             AJS.$("#" + team + " #future" + mileStone).empty();
-                            AJS.$("#" + team + " #future" + mileStone).append("<a href='http://jira.swisscom.com/issues/?jql=team=" + team + " and labels in (R-" + mileStone + ") and (status!=Closed and status !=R4Review)'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
+                            AJS.$("#" + team + " #future" + mileStone).append("<a href='http://jira.swisscom.com/issues/?jql=team=" + team + " and labels in (R-" + mileStone + ") and (status != Closed and status != R4Review)'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
                         } else {
                             AJS.$("#" + team + " #future" + mileStone).text(0);
                         }
