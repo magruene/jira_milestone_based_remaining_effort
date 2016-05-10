@@ -143,7 +143,7 @@ function startReportGeneration() {
 
                 if (sumPerMileStone[team][index] > 0) {
                     AJS.$("#" + team + " #future" + (index)).empty();
-                    AJS.$("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index].url + team + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
+                    AJS.$("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index][team] + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
                 } else {
                     AJS.$("#" + team + " #future" + (index)).text(0);
                 }
@@ -254,7 +254,7 @@ function consolidateFutureEffort(issues) {
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review";
-                matchedMilestones[mileStone].url = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=";
+                matchedMilestones[mileStone][currentTeam] = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=" + currentTeam;
                 AJS.$.ajax({
                     url: getIssuesForEpicsUrl,
                     async: false,
