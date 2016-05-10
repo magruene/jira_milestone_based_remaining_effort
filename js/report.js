@@ -143,7 +143,7 @@ function startReportGeneration() {
 
                 if (sumPerMileStone[team][index] > 0) {
                     AJS.$("#" + team + " #future" + (index)).empty();
-                    AJS.$("#" + team + " #future" + (index)).text("<a href='" + matchedMilestones[index].url + team + "'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
+                    AJS.$("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index].url + team + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
                 } else {
                     AJS.$("#" + team + " #future" + (index)).text(0);
                 }
