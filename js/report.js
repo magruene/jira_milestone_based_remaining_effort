@@ -1,13 +1,26 @@
-var teams = ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
-    possibleMilestoneLabels = ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
-    numberOfWeeksInThePast = 8,
-    selectedMilestoneLabels,
-    sumPerMileStone = {},
+/**
+ * Default options used if no options object is explicitly set. Values are:
+ *  - teams: Teams which should be looked for while generating the report
+ *  - possibleMilestoneLabels: milestone labels that should be looked for on epics/stories/tasks
+ *  - numberOfWeeksInTheFuture: how many weeks from now I should go
+ *  - numberOfWeeksInThePast: how many weeks should I go back?
+ */
+
+var defaultOptions = {
+    "teams": ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
+    "possibleMilestoneLabels": ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
+    "numberOfWeeksInTheFuture": 25,
+    "numberOfWeeksInThePast": 8
+};
+
+var sumPerMileStone = {},
     currentMilestoneMainRelease,
     currentMilestoneNextRelease,
+    options,
+    samVersions,
     onJira;
 
-var object = {};
+var matchedMilestones = {};
 
 
 // http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
@@ -28,14 +41,25 @@ if (!AJS) {
     onJira = true;
 }
 
+/**
+ * Init with an optional options object. If none is given, take defaultOptions
+ * @param givenOptions
+ */
+function init(givenOptions) {
+    if (givenOptions === undefined) {
+        options = defaultOptions;
+    } else {
+        options = givenOptions;
+    }
 
-function init() {
     AJS.$.ajax({
         url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
         contentType: 'application/json',
         dataType: "json",
         success: function (data) {
-            AJS.$.each(data, function (index, version) {
+            samVersions = data;
+
+            AJS.$.each(samVersions, function (index, version) {
                 if (!version.released) {
                     AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>");
                     AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>");
@@ -47,78 +71,85 @@ function init() {
     });
 }
 
+function getMilestoneForVersion(version) {
+    var release = new Date(version.releaseDate);
+    release.setDate(release.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
+    console.log(("" + release.getWeekNumber() - new Date().getWeekNumber()) + 1 + " weeks till " + version.name);
+
+    return release.getWeekNumber() - new Date().getWeekNumber();
+}
+
+function getCurrentMilestones() {
+    AJS.$.each(samVersions, function (index, version) {
+        if (version.name === AJS.$("#versionChooserMain").val()) {
+            currentMilestoneMainRelease = getMilestoneForVersion(version);
+        }
+        if (version.name === AJS.$("#versionChooserMainSecond").val()) {
+            currentMilestoneNextRelease = getMilestoneForVersion(version);
+        }
+    });
+}
+function matchMileStoneLabelsFromGivenReleases() {
+    for (var i = 1; i <= options.numberOfWeeksInTheFuture; i++) {
+        matchedMilestones[i] = {
+            mainRelease: "",
+            nextRelease: ""
+        };
+
+        if (currentMilestoneMainRelease >= 0) {
+            matchedMilestones[i].mainRelease = "R-" + currentMilestoneMainRelease;
+        }
+        if (currentMilestoneNextRelease >= 0) {
+            matchedMilestones[i].nextRelease = "R-" + currentMilestoneNextRelease;
+        }
+        if (currentMilestoneMainRelease === -1) {
+            matchedMilestones[i].mainRelease = "R+1";
+        }
+        if (currentMilestoneNextRelease === -1) {
+            matchedMilestones[i].nextRelease = "R+1";
+        }
+
+        currentMilestoneMainRelease--;
+        currentMilestoneNextRelease--;
+    }
+}
 function startReportGeneration() {
-    AJS.$.ajax({
-        url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
-        contentType: 'application/json',
-        dataType: "json",
-        success: function (data) {
-            var today = new Date();
-            AJS.$.each(data, function (index, version) {
-                if (!version.released && version.name === AJS.$("#versionChooserMain").val()) {
-                    var nextRelease = new Date(version.releaseDate);
-                    nextRelease.setDate(nextRelease.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
-                    currentMilestoneMainRelease = nextRelease.getWeekNumber() - today.getWeekNumber();
-                    console.log("We are at " + currentMilestoneMainRelease + " for the next release");
-                }
-                if (!version.released && version.name === AJS.$("#versionChooserMainSecond").val()) {
-                    var futureRelease = new Date(version.releaseDate);
-                    futureRelease.setDate(futureRelease.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
-                    currentMilestoneNextRelease = futureRelease.getWeekNumber() - today.getWeekNumber();
-                    console.log("We are at " + currentMilestoneNextRelease + " for the future release");
-                }
-            });
-            for (var i = 1; i <= 25; i++) {
-                object[i] = [];
-                if (currentMilestoneMainRelease >= 0) {
-                    object[i].push("R-" + currentMilestoneMainRelease);
-                } else if (currentMilestoneMainRelease === -1) {
-                    object[i].push("R+1");
-                }
-                if (currentMilestoneNextRelease >= 0) {
-                    object[i].push("R-" + currentMilestoneNextRelease);
-                } else if (currentMilestoneNextRelease === -1) {
-                    object[i].push("R+1");
-                }
+    getCurrentMilestones();
 
-                currentMilestoneMainRelease--;
-                currentMilestoneNextRelease--;
-            }
+    matchMileStoneLabelsFromGivenReleases();
 
-            resetTable();
+    resetTable();
 
-            var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (Skipper, Catta, Yankee, Private, Rico, Kowalski) and (status != Closed and status != R4Review) and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
-            ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
+    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (" + options.teams.join(",") + ") and status != Closed and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
+    ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
-            AJS.$.each(teams, function (index, team) {
-                for (var i = numberOfWeeksInThePast; i > 0; i--) {
-                    AJS.$("#" + team).append('<td id="past' + i + '"></td>');
-                    var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and ((resolutiondate >=-" + i + "w and (resolution=Done or resolution=Fixed)) or (status=R4Review and status changed to R4Review after -" + i + "w))";
-                    ajaxCallUnique(url, team, i, consolidatePastEffort);
-                }
+    AJS.$.each(options.teams, function (index, team) {
+        for (var i = options.numberOfWeeksInThePast; i > 0; i--) {
+            AJS.$("#" + team).append('<td id="past' + i + '"></td>');
+            var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and (resolutiondate >=-" + i + "w and (resolution=Done or resolution=Fixed))";
+            ajaxCallUnique(url, team, i, consolidatePastEffort);
+        }
 
-                AJS.$("#" + team).append('<td id="zero">0</td>');
-            });
+        AJS.$("#" + team).append('<td id="zero">0</td>');
+    });
 
 
-            AJS.$(document).ajaxStop(function () {
-                AJS.$.each(teams, function (index, team) {
-                    var currentSum = 0;
-                    AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-                        currentSum += sumPerMileStone[team][mileStone];
+    AJS.$(document).ajaxStop(function () {
+        AJS.$.each(options.teams, function (index, team) {
+            var currentSum = 0;
+            AJS.$.each(matchedMilestones, function (index) {
+                currentSum += sumPerMileStone[team][index];
 
-                        if (sumPerMileStone[team][mileStone] > 0) {
-                            AJS.$("#" + team + " #future" + mileStone).empty();
-                            AJS.$("#" + team + " #future" + mileStone).append("<a target='_blank' href='http://jira.swisscom.com/issues/?jql=team=" + team + " and labels in (R-" + mileStone + ") and (status != Closed and status != R4Review)'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
-                        } else {
-                            AJS.$("#" + team + " #future" + mileStone).text(0);
-                        }
-                    });
-                });
-                if (onJira) {
-                    gadget.resize();
+                if (sumPerMileStone[team][index] > 0) {
+                    AJS.$("#" + team + " #future" + (index)).empty();
+                    AJS.$("#" + team + " #future" + (index)).text(Math.round((currentSum / 28800) * 100) / 100);
+                } else {
+                    AJS.$("#" + team + " #future" + (index)).text(0);
                 }
             });
+        });
+        if (onJira) {
+            gadget.resize();
         }
     });
 }
@@ -135,25 +166,20 @@ function resetTable() {
     AJS.$("tbody").append('<tr id="Rico"><td>Rico</td></tr>');
     AJS.$("tbody").append('<tr id="Kowalski"><td>Kowalski</td></tr>');
 
-    for (var i = numberOfWeeksInThePast; i > 0; i--) {
+    for (var i = options.numberOfWeeksInThePast; i > 0; i--) {
         AJS.$("#reportTable thead tr").append("<th>-" + i + "</th>");
     }
     AJS.$("#reportTable thead tr").append("<th>0</th>");
 
-    selectedMilestoneLabels = [];
-    for (var i = 1; i <= 25; i++) {
-        selectedMilestoneLabels.push(i);
-    }
-
-    AJS.$.each(teams, function (index, team) {
+    AJS.$.each(options.teams, function (index, team) {
         sumPerMileStone[team] = {};
-        AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-            sumPerMileStone[team][mileStone] = 0;
+        AJS.$.each(matchedMilestones, function (index) {
+            sumPerMileStone[team][index] = 0;
         });
     });
 
-    AJS.$.each(selectedMilestoneLabels, function (index, mileStone) {
-        AJS.$("#reportTable thead tr").append("<th>+" + mileStone + "</th>");
+    AJS.$.each(matchedMilestones, function (index, mileStone) {
+        AJS.$("#reportTable thead tr").append("<th>" + mileStone.mainRelease + " / " + mileStone.nextRelease + "</th>");
     });
 }
 
@@ -162,16 +188,13 @@ function consolidatePastEffort(team, weeksInThePast, issues) {
 }
 
 function consolidateFutureEffort(issues) {
-    debugger;
     var groupedIssuesByTeam = _.groupBy(issues, function (issue) {
         return issue.fields.customfield_14850.value; //Team
     });
 
- debugger;
     AJS.$.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
-        AJS.$.each(selectedMilestoneLabels, function (index, mileStoneLabel) {
-            AJS.$("#" + currentTeam).append('<td id="future' + mileStoneLabel + '"></td>');
-            AJS.$("#" + currentTeam + " #future" + mileStoneLabel).text("0");
+        AJS.$.each(matchedMilestones, function (index) {
+            AJS.$("#" + currentTeam).append('<td id="future' + (index) + '">0</td>');
         });
 
         var issueGroup = groupedIssuesByTeam[currentTeam];
@@ -186,27 +209,23 @@ function consolidateFutureEffort(issues) {
                 issue.fields.labels = [AJS.$("#mainReleaseMS").val()];
             }
 
-            AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
-                AJS.$.each(object, function (index, futureWeek) {
-                    if (fixVersion === AJS.$("#versionChooserMain").val()) {
-                        if (futureWeek.length === 2 && futureWeek[0] === currentLabel) {
-                            label = "" + index;
-                        }
+            AJS.$.each(issue.fields.labels, function (i, currentLabel) {
+                AJS.$.each(matchedMilestones, function (index, futureWeek) {
+                    if (fixVersion === AJS.$("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
+                        label = "" + index;
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val() || fixVersion === AJS.$("#versionChooserSmall").val()) {
-                        if (futureWeek.length === 2) {
-                            if (futureWeek[1] === currentLabel) {
+                        if (futureWeek.mainRelease !== undefined && futureWeek.nextRelease !== undefined) {
+                            if (futureWeek.nextRelease === currentLabel) {
                                 label = "" + index;
                             }
-                        } else if (futureWeek.length === 1) {
-                            if (futureWeek[0] === currentLabel) {
+                        } else if (futureWeek.mainRelease !== undefined) {
+                            if (futureWeek.mainRelease === currentLabel) {
                                 label = "" + index;
                             }
                         }
                     }
                 });
-
-
             });
 
             //This is work that still has to be done even though the milestone is in the past
@@ -234,7 +253,7 @@ function consolidateFutureEffort(issues) {
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review";
-
+                matchedMilestones[mileStone].url = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=Private"
                 AJS.$.ajax({
                     url: getIssuesForEpicsUrl,
                     async: false,
@@ -260,25 +279,22 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
         });
 
         AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
-            AJS.$.each(object, function (index, futureWeek) {
-                if (fixVersion === AJS.$("#versionChooserMain").val()) {
-                    if (futureWeek.length === 2 && futureWeek[0] === currentLabel) {
-                        label = "" + index;
-                    }
+            AJS.$.each(matchedMilestones, function (index, futureWeek) {
+                if (fixVersion === AJS.$("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
+                    label = "" + index;
                 }
                 if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
-                    if (futureWeek.length === 2) {
-                        if (futureWeek[1] === currentLabel) {
+                    if (futureWeek.mainRelease !== undefined && futureWeek.nextRelease !== undefined) {
+                        if (futureWeek.nextRelease === currentLabel) {
                             label = "" + index;
                         }
-                    } else if (futureWeek.length === 1) {
-                        if (futureWeek[0] === currentLabel) {
+                    } else if (futureWeek.mainRelease !== undefined) {
+                        if (futureWeek.mainRelease === currentLabel) {
                             label = "" + index;
                         }
                     }
                 }
             });
-
         });
 
         if (label && label !== mileStone) {
@@ -330,6 +346,5 @@ function calculateIssueSum(issues) {
 }
 
 var Report = {};
-Report.possibleMilestones = possibleMilestoneLabels;
 Report.init = init;
 window.Report = Report;
