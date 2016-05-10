@@ -7,7 +7,7 @@
  */
 
 var defaultOptions = {
-    "teams": ["Skipper", "Catta", "Yankee", "Private", "Rico", "Kowalski"],
+    "teams": ["Skipper"],
     "possibleMilestoneLabels": ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
     "numberOfWeeksInTheFuture": 25,
     "numberOfWeeksInThePast": 8
@@ -216,14 +216,8 @@ function consolidateFutureEffort(issues) {
                         label = "" + index;
                     }
                     if (fixVersion === AJS.$("#versionChooserMainSecond").val() || fixVersion === AJS.$("#versionChooserSmall").val()) {
-                        if (futureWeek.mainRelease !== undefined && futureWeek.nextRelease !== undefined) {
-                            if (futureWeek.nextRelease === currentLabel) {
-                                label = "" + index;
-                            }
-                        } else if (futureWeek.mainRelease !== undefined) {
-                            if (futureWeek.mainRelease === currentLabel) {
-                                label = "" + index;
-                            }
+                        if (futureWeek.nextRelease === currentLabel) {
+                            label = "" + index;
                         }
                     }
                 });
@@ -253,8 +247,8 @@ function consolidateFutureEffort(issues) {
 
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
-                var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review";
-                matchedMilestones[mileStone][currentTeam] = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=" + currentTeam;
+                var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed";
+                matchedMilestones[mileStone][currentTeam] = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and team=" + currentTeam;
                 AJS.$.ajax({
                     url: getIssuesForEpicsUrl,
                     async: false,
@@ -285,14 +279,8 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
                     label = "" + index;
                 }
                 if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
-                    if (futureWeek.mainRelease !== undefined && futureWeek.nextRelease !== undefined) {
-                        if (futureWeek.nextRelease === currentLabel) {
-                            label = "" + index;
-                        }
-                    } else if (futureWeek.mainRelease !== undefined) {
-                        if (futureWeek.mainRelease === currentLabel) {
-                            label = "" + index;
-                        }
+                    if (futureWeek.nextRelease === currentLabel) {
+                        label = "" + index;
                     }
                 }
             });
@@ -303,7 +291,9 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
         } else {
             sumPerMileStone[teamForIssue][mileStone] += issue.fields.timeoriginalestimate;
         }
-
+        if (label === 1) {
+            console.log(sumPerMileStone[teamForIssue][label])
+        }
     });
 
 
