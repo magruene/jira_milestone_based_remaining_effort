@@ -26,7 +26,7 @@ var matchedMilestones = {};
 // http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
 Date.prototype.getWeekNumber = function () {
     var d = new Date(+this);
-    d.setMilliseconds(0)
+    d.setMilliseconds(0);
     d.setHours(0, 0, 0);
     d.setDate(d.getDate() + 4 - (d.getDay() || 7));
     return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
@@ -113,6 +113,7 @@ function matchMileStoneLabelsFromGivenReleases() {
         currentMilestoneNextRelease--;
     }
 }
+
 function startReportGeneration() {
     getCurrentMilestones();
 
@@ -142,7 +143,7 @@ function startReportGeneration() {
 
                 if (sumPerMileStone[team][index] > 0) {
                     AJS.$("#" + team + " #future" + (index)).empty();
-                    AJS.$("#" + team + " #future" + (index)).text(Math.round((currentSum / 28800) * 100) / 100);
+                    AJS.$("#" + team + " #future" + (index)).text("<a href='" + matchedMilestones[index].url + team + "'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
                 } else {
                     AJS.$("#" + team + " #future" + (index)).text(0);
                 }
@@ -230,7 +231,7 @@ function consolidateFutureEffort(issues) {
 
             //This is work that still has to be done even though the milestone is in the past
             if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.labels.length > 0) {
-                console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " are not yet done and will be added to next weeks work");
+                console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " is not yet done or wrongly labeled and will be added to next weeks work");
                 label = "" + 1;
             }
             if (label !== undefined) {
@@ -253,7 +254,7 @@ function consolidateFutureEffort(issues) {
         AJS.$.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review";
-                matchedMilestones[mileStone].url = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=Private"
+                matchedMilestones[mileStone].url = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and status != R4Review and team=";
                 AJS.$.ajax({
                     url: getIssuesForEpicsUrl,
                     async: false,
