@@ -161,7 +161,6 @@ function resetTable() {
     $("#reportTable thead tr").append("<th>Team</th>th>");
     $("tbody").append('<tr id="Skipper"><td>Skipper</td></tr>');
     $("tbody").append('<tr id="Catta"><td>Catta</td></tr>');
-    $("tbody").append('<tr id="Yankee"><td>Yankee</td></tr>');
     $("tbody").append('<tr id="Private"><td>Private</td></tr>');
     $("tbody").append('<tr id="Rico"><td>Rico</td></tr>');
     $("tbody").append('<tr id="Kowalski"><td>Kowalski</td></tr>');
