@@ -180,6 +180,11 @@ function resetTable() {
     $.each(matchedMilestones, function (index, mileStone) {
         $("#reportTable thead tr").append("<th>" + mileStone.mainRelease + " / " + mileStone.nextRelease + "</th>");
     });
+    
+    AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
+            AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
+                gadget.resize();
+            });
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
