@@ -22,6 +22,8 @@ var sumPerMileStone = {},
 
 var matchedMilestones = {};
 
+var gadgetId;
+
 
 // http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
 Date.prototype.getWeekNumber = function () {
@@ -32,41 +34,37 @@ Date.prototype.getWeekNumber = function () {
     return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
 };
 
-//if not on jira, we need to initialize this.
-if (!AJS) {
-    onJira = false;
-    var AJS = {};
-    AJS.$ = $;
-} else {
-    onJira = true;
-}
-
 /**
  * Init with an optional options object. If none is given, take defaultOptions
  * @param givenOptions
  */
-function init(givenOptions) {
+function init(givenGadgetId, givenOptions) {
+    gadgetId = givenGadgetId;
     if (givenOptions === undefined) {
         options = defaultOptions;
     } else {
         options = givenOptions;
     }
 
-    AJS.$.ajax({
+    $.ajax({
         url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
         contentType: 'application/json',
         dataType: "json",
         success: function (data) {
             samVersions = data;
 
-            AJS.$.each(samVersions, function (index, version) {
+            $.each(samVersions, function (index, version) {
                 if (!version.released) {
-                    AJS.$("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>");
-                    AJS.$("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>");
-                    AJS.$("#versionChooserMainSecond").append("<option value='" + version.name + "'>" + version.name + "</option>");
+                    $("#versionChooserMain").append("<option value='" + version.name + "'>" + version.name + "</option>");
+                    $("#versionChooserSmall").append("<option value='" + version.name + "'>" + version.name + "</option>");
+                    $("#versionChooserMainSecond").append("<option value='" + version.name + "'>" + version.name + "</option>");
                 }
             });
-            AJS.$("button").click(startReportGeneration);
+            $("button").click(startReportGeneration);
+            AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
+            AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
+                gadget.resize();
+            });
         }
     });
 }
@@ -80,11 +78,11 @@ function getMilestoneForVersion(version) {
 }
 
 function getCurrentMilestones() {
-    AJS.$.each(samVersions, function (index, version) {
-        if (version.name === AJS.$("#versionChooserMain").val()) {
+    $.each(samVersions, function (index, version) {
+        if (version.name === $("#versionChooserMain").val()) {
             currentMilestoneMainRelease = getMilestoneForVersion(version);
         }
-        if (version.name === AJS.$("#versionChooserMainSecond").val()) {
+        if (version.name === $("#versionChooserMainSecond").val()) {
             currentMilestoneNextRelease = getMilestoneForVersion(version);
         }
     });
@@ -121,71 +119,72 @@ function startReportGeneration() {
 
     resetTable();
 
-    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (" + options.teams.join(",") + ") and status != Closed and issueType = Epic and fixVersion in ('" + AJS.$("#versionChooserMain").val() + "', '" + AJS.$("#versionChooserSmall").val() + "', '" + AJS.$("#versionChooserMainSecond").val() + "')";
+    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (" + options.teams.join(",") + ") and status != Closed and issueType = Epic and fixVersion in ('" + $("#versionChooserMain").val() + "', '" + $("#versionChooserSmall").val() + "', '" + $("#versionChooserMainSecond").val() + "')";
     ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
-    AJS.$.each(options.teams, function (index, team) {
+    $.each(options.teams, function (index, team) {
         for (var i = options.numberOfWeeksInThePast; i > 0; i--) {
-            AJS.$("#" + team).append('<td id="past' + i + '"></td>');
+            $("#" + team).append('<td id="past' + i + '"></td>');
             var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and (resolutiondate >=-" + i + "w and (resolution=Done or resolution=Fixed))";
             ajaxCallUnique(url, team, i, consolidatePastEffort);
         }
 
-        AJS.$("#" + team).append('<td id="zero">0</td>');
+        $("#" + team).append('<td id="zero">0</td>');
     });
 
 
-    AJS.$(document).ajaxStop(function () {
-        AJS.$.each(options.teams, function (index, team) {
+    $(document).ajaxStop(function () {
+        $.each(options.teams, function (index, team) {
             var currentSum = 0;
-            AJS.$.each(matchedMilestones, function (index) {
+            $.each(matchedMilestones, function (index) {
                 currentSum += sumPerMileStone[team][index];
 
                 if (sumPerMileStone[team][index] > 0) {
-                    AJS.$("#" + team + " #future" + (index)).empty();
-                    AJS.$("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index][team] + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
+                    $("#" + team + " #future" + (index)).empty();
+                    $("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index][team] + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
                 } else {
-                    AJS.$("#" + team + " #future" + (index)).text(0);
+                    $("#" + team + " #future" + (index)).text(0);
                 }
             });
         });
-        if (onJira) {
+        AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
+        AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
             gadget.resize();
-        }
+        });
     });
 }
 
 function resetTable() {
-    AJS.$("thead tr").empty();
-    AJS.$("tbody").empty();
+    $("thead tr").empty();
+    $("tbody").empty();
 
-    AJS.$("#reportTable thead tr").append("<th>Team</th>th>");
-    AJS.$("tbody").append('<tr id="Skipper"><td>Skipper</td></tr>');
-    AJS.$("tbody").append('<tr id="Catta"><td>Catta</td></tr>');
-    AJS.$("tbody").append('<tr id="Yankee"><td>Yankee</td></tr>');
-    AJS.$("tbody").append('<tr id="Private"><td>Private</td></tr>');
-    AJS.$("tbody").append('<tr id="Rico"><td>Rico</td></tr>');
-    AJS.$("tbody").append('<tr id="Kowalski"><td>Kowalski</td></tr>');
+    $("#reportTable thead tr").append("<th>Team</th>th>");
+    $("tbody").append('<tr id="Skipper"><td>Skipper</td></tr>');
+    $("tbody").append('<tr id="Catta"><td>Catta</td></tr>');
+    $("tbody").append('<tr id="Yankee"><td>Yankee</td></tr>');
+    $("tbody").append('<tr id="Private"><td>Private</td></tr>');
+    $("tbody").append('<tr id="Rico"><td>Rico</td></tr>');
+    $("tbody").append('<tr id="Kowalski"><td>Kowalski</td></tr>');
 
     for (var i = options.numberOfWeeksInThePast; i > 0; i--) {
-        AJS.$("#reportTable thead tr").append("<th>-" + i + "</th>");
+        $("#reportTable thead tr").append("<th>-" + i + "</th>");
     }
-    AJS.$("#reportTable thead tr").append("<th>0</th>");
+    $("#reportTable thead tr").append("<th>0</th>");
 
-    AJS.$.each(options.teams, function (index, team) {
+    $.each(options.teams, function (index, team) {
         sumPerMileStone[team] = {};
-        AJS.$.each(matchedMilestones, function (index) {
+        $.each(matchedMilestones, function (index) {
             sumPerMileStone[team][index] = 0;
         });
     });
 
-    AJS.$.each(matchedMilestones, function (index, mileStone) {
-        AJS.$("#reportTable thead tr").append("<th>" + mileStone.mainRelease + " / " + mileStone.nextRelease + "</th>");
+    $.each(matchedMilestones, function (index, mileStone) {
+        $("#reportTable thead tr").append("<th>" + mileStone.mainRelease + " / " + mileStone.nextRelease + "</th>");
     });
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
-    AJS.$("#" + team + " #past" + weeksInThePast).text("-" + calculateIssueSum(issues));
+    $("#" + team + " #past" + weeksInThePast).text("-" + calculateIssueSum(issues));
 }
 
 function consolidateFutureEffort(issues) {
@@ -193,29 +192,29 @@ function consolidateFutureEffort(issues) {
         return issue.fields.customfield_14850.value; //Team
     });
 
-    AJS.$.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
-        AJS.$.each(matchedMilestones, function (index) {
-            AJS.$("#" + currentTeam).append('<td id="future' + (index) + '">0</td>');
+    $.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
+        $.each(matchedMilestones, function (index) {
+            $("#" + currentTeam).append('<td id="future' + (index) + '">0</td>');
         });
 
         var issueGroup = groupedIssuesByTeam[currentTeam];
 
         var groupedIssuesByMileStone = _.groupBy(issueGroup, function (issue) {
             var label, fixVersion;
-            AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
+            $.each(issue.fields.fixVersions, function (index, currentFixVersion) {
                 fixVersion = currentFixVersion.name;
             });
 
-            if (fixVersion === AJS.$("#versionChooserSmall").val()) {
-                issue.fields.labels = [AJS.$("#mainReleaseMS").val()];
+            if (fixVersion === $("#versionChooserSmall").val()) {
+                issue.fields.labels = [$("#mainReleaseMS").val()];
             }
 
-            AJS.$.each(issue.fields.labels, function (i, currentLabel) {
-                AJS.$.each(matchedMilestones, function (index, futureWeek) {
-                    if (fixVersion === AJS.$("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
+            $.each(issue.fields.labels, function (i, currentLabel) {
+                $.each(matchedMilestones, function (index, futureWeek) {
+                    if (fixVersion === $("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
                         label = "" + index;
                     }
-                    if (fixVersion === AJS.$("#versionChooserMainSecond").val() || fixVersion === AJS.$("#versionChooserSmall").val()) {
+                    if (fixVersion === $("#versionChooserMainSecond").val() || fixVersion === $("#versionChooserSmall").val()) {
                         if (futureWeek.nextRelease === currentLabel) {
                             label = "" + index;
                         }
@@ -224,7 +223,7 @@ function consolidateFutureEffort(issues) {
             });
 
             //This is work that still has to be done even though the milestone is in the past
-            if (label === undefined && fixVersion === AJS.$("#versionChooserMain").val() && issue.fields.labels.length > 0) {
+            if (label === undefined && fixVersion === $("#versionChooserMain").val() && issue.fields.labels.length > 0) {
                 console.log("Epic with number: " + issue.key + " with labels: " + issue.fields.labels + " is not yet done or wrongly labeled and will be added to next weeks work");
                 label = "" + 1;
             }
@@ -245,11 +244,11 @@ function consolidateFutureEffort(issues) {
             return 0;
         });
 
-        AJS.$.each(sortable, function (index, mileStone) {
+        $.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
                 var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed";
                 matchedMilestones[mileStone][currentTeam] = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and team=" + currentTeam;
-                AJS.$.ajax({
+                $.ajax({
                     url: getIssuesForEpicsUrl,
                     async: false,
                     contentType: 'application/json',
@@ -265,20 +264,20 @@ function consolidateFutureEffort(issues) {
 
 function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
     var sum = 0;
-    AJS.$.each(issues, function (index, issue) {
+    $.each(issues, function (index, issue) {
         var label, fixVersion;
         var teamForIssue = issue.fields.customfield_14850 != undefined ? issue.fields.customfield_14850.value : team;
 
-        AJS.$.each(issue.fields.fixVersions, function (index, currentFixVersion) {
+        $.each(issue.fields.fixVersions, function (index, currentFixVersion) {
             fixVersion = currentFixVersion.name;
         });
 
-        AJS.$.each(issue.fields.labels, function (indexthingy, currentLabel) {
-            AJS.$.each(matchedMilestones, function (index, futureWeek) {
-                if (fixVersion === AJS.$("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
+        $.each(issue.fields.labels, function (indexthingy, currentLabel) {
+            $.each(matchedMilestones, function (index, futureWeek) {
+                if (fixVersion === $("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
                     label = "" + index;
                 }
-                if (fixVersion === AJS.$("#versionChooserMainSecond").val()) {
+                if (fixVersion === $("#versionChooserMainSecond").val()) {
                     if (futureWeek.nextRelease === currentLabel) {
                         label = "" + index;
                     }
@@ -305,7 +304,7 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
 }
 
 function ajaxCall(url, successFunction) {
-    return AJS.$.ajax({
+    return $.ajax({
         url: url,
         contentType: 'application/json',
         dataType: "json",
@@ -316,7 +315,7 @@ function ajaxCall(url, successFunction) {
 }
 
 function ajaxCallUnique(url, team, specialIdentifier, successFunction) {
-    return AJS.$.ajax({
+    return $.ajax({
         url: url,
         contentType: 'application/json',
         dataType: "json",
@@ -329,7 +328,7 @@ function ajaxCallUnique(url, team, specialIdentifier, successFunction) {
 function calculateIssueSum(issues) {
     var sumEstimate = 0;
 
-    AJS.$.each(issues, function (index, issue) {
+    $.each(issues, function (index, issue) {
         sumEstimate += issue.fields.timeoriginalestimate / 28800; //from millis to PT
     });
 
