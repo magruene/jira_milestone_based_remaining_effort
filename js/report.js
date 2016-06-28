@@ -22,6 +22,9 @@ var sumPerMileStone = {},
 
 var matchedMilestones = {};
 
+/**
+ * ID of the text-gadget this report is used. Something like "gadget-50750".
+ */
 var gadgetId;
 
 
@@ -141,7 +144,7 @@ function startReportGeneration() {
 
                 if (sumPerMileStone[team][index] > 0) {
                     $("#" + team + " #future" + (index)).empty();
-                    $("#" + team + " #future" + (index)).append('<a href="' + matchedMilestones[index][team] + '">' + Math.round((currentSum / 28800) * 100) / 100 + '</a>');
+                    $("#" + team + " #future" + (index)).append(Math.round((currentSum / 28800) * 100) / 100);
                 } else {
                     $("#" + team + " #future" + (index)).text(0);
                 }
@@ -182,9 +185,9 @@ function resetTable() {
     });
     
     AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
-            AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
-                gadget.resize();
-            });
+    AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
+        gadget.resize();
+    });
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
@@ -197,8 +200,8 @@ function consolidateFutureEffort(issues) {
     });
 
     $.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
-        $.each(matchedMilestones, function (index) {
-            $("#" + currentTeam).append('<td id="future' + (index) + '">0</td>');
+        $.each(matchedMilestones, function (index, matchedMilestone) {
+            $("#" + currentTeam).append('<td data-main="' + mileStone.mainRelease + '" data-next="' + mileStone.nextRelease + '" id="future' + (index) + '">0</td>');
         });
 
         var issueGroup = groupedIssuesByTeam[currentTeam];
