@@ -80,7 +80,7 @@ function getMilestoneForVersion(version) {
     //alert(date2)
     alert(Math.round(dif/1000/60/60/24/7))
    
-    console.log(("" + Math.round(dif/1000/60/60/24/7) + 1 + " weeks till " + version.name);
+    console.log("" + Math.round(dif/1000/60/60/24/7) + 1 + " weeks till " + version.name);
 
     return Math.round(dif/1000/60/60/24/7);
 }
