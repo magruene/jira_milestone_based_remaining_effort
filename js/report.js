@@ -205,7 +205,7 @@ function consolidateFutureEffort(issues) {
     });
 
     $.each(_.keys(groupedIssuesByTeam), function (index, currentTeam) {
-        $.each(matchedMilestones, function (index, matchedMilestone) {
+        $.each(matchedMilestones, function (index, mileStone) {
             $("#" + currentTeam).append('<td data-main="' + mileStone.mainRelease + '" data-next="' + mileStone.nextRelease + '" id="future' + (index) + '">0</td>');
         });
 
