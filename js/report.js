@@ -39,6 +39,7 @@ Date.prototype.getWeekNumber = function () {
 
 /**
  * Init with an optional options object. If none is given, take defaultOptions
+ * @param givenGadgetId
  * @param givenOptions
  */
 function init(givenGadgetId, givenOptions) {
@@ -118,6 +119,12 @@ function matchMileStoneLabelsFromGivenReleases() {
     }
 }
 
+function resize() {
+    AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height"));
+    AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function (index, gadget) {
+        gadget.resize();
+    });
+}
 function startReportGeneration() {
     getCurrentMilestones();
 
@@ -143,20 +150,18 @@ function startReportGeneration() {
         $.each(options.teams, function (index, team) {
             var currentSum = 0;
             $.each(matchedMilestones, function (index) {
-                currentSum += sumPerMileStone[team][index];
+                currentSum += sumPerMileStone[team][index].sum;
 
-                if (sumPerMileStone[team][index] > 0) {
+                if (sumPerMileStone[team][index].sum > 0) {
                     $("#" + team + " #future" + (index)).empty();
                     $("#" + team + " #future" + (index)).append(Math.round((currentSum / 28800) * 100) / 100);
                 } else {
                     $("#" + team + " #future" + (index)).text(0);
                 }
+                console.log("Have the following issues for milestone (" + index + "): " + sumPerMileStone[team][index].issues.split(","))
             });
         });
-        AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
-        AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
-            gadget.resize();
-        });
+        resize();
     });
 }
 
@@ -179,18 +184,15 @@ function resetTable() {
     $.each(options.teams, function (index, team) {
         sumPerMileStone[team] = {};
         $.each(matchedMilestones, function (index) {
-            sumPerMileStone[team][index] = 0;
+            sumPerMileStone[team][index] = {sum: 0, issues: []};
         });
     });
 
     $.each(matchedMilestones, function (index, mileStone) {
         $("#reportTable thead tr").append("<th>" + mileStone.mainRelease + " / " + mileStone.nextRelease + "</th>");
     });
-    
-    AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
-    AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
-        gadget.resize();
-    });
+
+    resize();
 }
 
 function consolidatePastEffort(team, weeksInThePast, issues) {
@@ -296,9 +298,11 @@ function calculateRemainingEstimateForMileStone(team, mileStone, issues) {
         });
 
         if (label && label !== mileStone) {
-            sumPerMileStone[teamForIssue][label] += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][label].sum += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][label].issues.push(issue.key);
         } else {
-            sumPerMileStone[teamForIssue][mileStone] += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][mileStone].sum += issue.fields.timeoriginalestimate;
+            sumPerMileStone[teamForIssue][mileStone].issues.push(issue.key);
         }
         if (label === 1) {
             console.log(sumPerMileStone[teamForIssue][label])
