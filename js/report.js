@@ -222,13 +222,11 @@ function consolidateFutureEffort(issues) {
 
             $.each(issue.fields.labels, function (i, currentLabel) {
                 $.each(matchedMilestones, function (index, futureWeek) {
-                    if (fixVersion === $("#versionChooserMain").val() && futureWeek.mainRelease === currentLabel) {
+                    if ((fixVersion === $("#versionChooserMain").val() || fixVersion === $("#versionChooserSmall").val()) && futureWeek.mainRelease === currentLabel) {
                         label = "" + index;
                     }
-                    if (fixVersion === $("#versionChooserMainSecond").val() || fixVersion === $("#versionChooserSmall").val()) {
-                        if (futureWeek.nextRelease === currentLabel) {
-                            label = "" + index;
-                        }
+                    if (fixVersion === $("#versionChooserMainSecond").val() && futureWeek.nextRelease === currentLabel) {
+                        label = "" + index;
                     }
                 });
             });
