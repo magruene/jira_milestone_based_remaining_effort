@@ -77,9 +77,10 @@ function getMilestoneForVersion(version) {
     release.setDate(release.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
     var today = new Date();
     var dif = Math.round(release-today);
-    console.log("" + Math.round(dif/1000/60/60/24/7) + 1 + " weeks till " + version.name);
+    var weeksTillRelease = today.getDay() < 3 ? Math.round((dif/1000/60/60/24/7) - 1) : Math.round(dif/1000/60/60/24/7);
+    console.log("" + weeksTillRelease + " weeks till " + version.name);
 
-    return Math.round(dif/1000/60/60/24/7);
+    return weeksTillRelease;
 }
 
 function getCurrentMilestones() {
