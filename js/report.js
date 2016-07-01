@@ -154,11 +154,10 @@ function startReportGeneration() {
 
                 if (sumPerMileStone[team][index].sum > 0) {
                     $("#" + team + " #future" + (index)).empty();
-                    $("#" + team + " #future" + (index)).append(Math.round((currentSum / 28800) * 100) / 100);
+                    $("#" + team + " #future" + (index)).append("<a href='http://jira.swisscom.com/issues/?jql=issuekey in (" + sumPerMileStone[team][index].issues.join(",") + ")'>" + Math.round((currentSum / 28800) * 100) / 100 + "</a>");
                 } else {
                     $("#" + team + " #future" + (index)).text(0);
                 }
-                console.log("Have the following issues for milestone (" + index + "): " + sumPerMileStone[team][index].issues.split(","))
             });
         });
         resize();
