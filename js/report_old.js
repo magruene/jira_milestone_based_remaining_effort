@@ -7,7 +7,7 @@
  */
 
 var defaultOptions = {
-    "teams": ["Skipper", "Catta", "Kowalski", "Private", "Rico"],
+    "teams": ["Skipper", "Catta"],
     "possibleMilestoneLabels": ["R-20", "R-19", "R-18", "R-17", "R-16", "R-15", "R-14", "R-13", "R-12", "R-11", "R-10", "R-9", "R-8", "R-7", "R-6", "R-5", "R-4", "R-3", "R-2", "R-1", "R-0", "R1"],
     "numberOfWeeksInTheFuture": 25,
     "numberOfWeeksInThePast": 8
@@ -17,13 +17,14 @@ var sumPerMileStone = {},
     currentMilestoneMainRelease,
     currentMilestoneNextRelease,
     options,
-    samVersions,
-    onJira;
+    samVersions;
 
 var matchedMilestones = {};
 
+const JIRA_BASE_URL = "https://jira.swisscom.com/rest/api/2/";
+
 /**
- * ID of the text-gadget this report is used. Something like "gadget-50750".
+ * ID of the text-gadget this report.js is used. Something like "gadget-50750".
  */
 var gadgetId;
 
@@ -51,7 +52,7 @@ function init(givenGadgetId, givenOptions) {
     }
 
     $.ajax({
-        url: "http://jira.swisscom.com/rest/api/2/project/SAM/versions",
+        url: JIRA_BASE_URL + "project/SAM/versions",
         contentType: 'application/json',
         dataType: "json",
         success: function (data) {
@@ -65,23 +66,12 @@ function init(givenGadgetId, givenOptions) {
                 }
             });
             $("button").click(startReportGeneration);
-            AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height")); 
-            AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function(index, gadget) { 
+            AJS.$("#" + gadgetId + " iframe").css("height", $("html").css("height"));
+            AJS.$.each(parent.AG.DashboardManager.activeLayout.getGadgets(), function (index, gadget) {
                 gadget.resize();
             });
         }
     });
-}
-
-function getMilestoneForVersion(version) {
-    var release = new Date(version.releaseDate);
-    release.setDate(release.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
-    var today = new Date();
-    var dif = Math.round(release-today);
-    var weeksTillRelease = today.getDay() < 3 ? Math.round((dif/1000/60/60/24/7) - 1) : Math.round(dif/1000/60/60/24/7);
-    console.log("" + weeksTillRelease + " weeks till " + version.name);
-
-    return weeksTillRelease;
 }
 
 function getCurrentMilestones() {
@@ -94,6 +84,18 @@ function getCurrentMilestones() {
         }
     });
 }
+
+function getMilestoneForVersion(version) {
+    var release = new Date(version.releaseDate);
+    release.setDate(release.getDate() - 1); // release date is set to monday after release, for the correct calculation of the week we need the actual release which is sunday
+    var today = new Date();
+    var dif = Math.round(release - today);
+    var weeksTillRelease = today.getDay() < 3 ? Math.round((dif / 1000 / 60 / 60 / 24 / 7) - 1) : Math.round(dif / 1000 / 60 / 60 / 24 / 7);
+    console.log("" + weeksTillRelease + " weeks till " + version.name);
+
+    return weeksTillRelease;
+}
+
 function matchMileStoneLabelsFromGivenReleases() {
     for (var i = 1; i <= options.numberOfWeeksInTheFuture; i++) {
         matchedMilestones[i] = {
@@ -132,13 +134,13 @@ function startReportGeneration() {
 
     resetTable();
 
-    var getAllEpicsForTeams = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team in (" + options.teams.join(",") + ") and status != Closed and issueType = Epic and fixVersion in ('" + $("#versionChooserMain").val() + "', '" + $("#versionChooserSmall").val() + "', '" + $("#versionChooserMainSecond").val() + "')";
+    var getAllEpicsForTeams = JIRA_BASE_URL + "search?maxResults=500&jql=project=SAM and team in (" + options.teams.join(",") + ") and status != Closed and issueType = Epic and fixVersion in ('" + $("#versionChooserMain").val() + "', '" + $("#versionChooserSmall").val() + "', '" + $("#versionChooserMainSecond").val() + "')";
     ajaxCall(getAllEpicsForTeams, consolidateFutureEffort);
 
     $.each(options.teams, function (index, team) {
         for (var i = options.numberOfWeeksInThePast; i > 0; i--) {
             $("#" + team).append('<td id="past' + i + '"></td>');
-            var url = "http://jira.swisscom.com/rest/api/2/search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and (resolutiondate >=-" + i + "w and (resolution=Done or resolution=Fixed))";
+            var url = JIRA_BASE_URL + "search?maxResults=500&jql=project=SAM and team=" + team + " and (issuetype=Story or issuetype=Task) and (resolutiondate >=-" + i + "w and (resolution=Done or resolution=Fixed))";
             ajaxCallUnique(url, team, i, consolidatePastEffort);
         }
 
@@ -255,7 +257,7 @@ function consolidateFutureEffort(issues) {
 
         $.each(sortable, function (index, mileStone) {
             if (mileStone !== "NotSpecified") {
-                var getIssuesForEpicsUrl = "http://jira.swisscom.com/rest/api/2/search?maxResults=5000&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and summary !~ 'Business Review' and summary !~ 'Ensure Documentation' and summary !~ 'Review Testcases by DEV-Spoc with Tester and SD'";
+                var getIssuesForEpicsUrl = JIRA_BASE_URL + "search?maxResults=5000&jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and summary !~ 'Business Review' and summary !~ 'Ensure Documentation' and summary !~ 'Review Testcases by DEV-Spoc with Tester and SD'";
                 matchedMilestones[mileStone][currentTeam] = "http://jira.swisscom.com/issues/?jql='Epic Link' in (" + _.pluck(groupedIssuesByMileStone[mileStone], 'key').join(", ") + ") and status != Closed and team=" + currentTeam;
                 $.ajax({
                     url: getIssuesForEpicsUrl,
