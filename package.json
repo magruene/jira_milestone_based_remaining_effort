@@ -19,6 +19,7 @@
     "gulp-util": "^3.0.7",
     "html-webpack-plugin": "^2.22.0",
     "jira-connector": "^2.5.0",
+    "jsdoc": "^3.4.3",
     "json-loader": "^0.5.4",
     "materialize-css": "^0.97.8",
     "node-sass": "^4.1.1",
