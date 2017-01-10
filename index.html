@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="node_modules/materialize-css/dist/css/materialize.min.css">
 <script src="node_modules/jquery/dist/jquery.js"></script>
 <script src="node_modules/materialize-css/dist/js/materialize.min.js"></script>
+<script src="dist/jira.js"></script>
 <script src="dist/bundle.js"></script>
 <!--<script src="http://rawgit.com/magruene/jira_milestone_based_remaining_effort/master/js/report.js"></script>-->
 <script>
@@ -25,27 +26,11 @@
     <p>This is a draft for milestone based effort reporting.</p>
     <div class="row" id="testId"></div>
     <div class="row">
-        <button type="button" class="col s12 btn btn-info">Get data</button>
+        <button type="button" class="col s3 btn btn-info">Get data</button>
     </div>
 
     <div class="row">
-        <div class="col s12">
-            <table class="bordered">
-                <thead>
-                <tr>
-                    <th data-field="team_id">Team</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr id="team_Skipper">
-                    <td>Skipper</td>
-                </tr>
-                <tr id="team_Catta">
-                    <td>Catta</td>
-                </tr>
-                </tbody>
-            </table>
+        <div id="tableContainer" class="col s12">
         </div>
     </div>
 </div>

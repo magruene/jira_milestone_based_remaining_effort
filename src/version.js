@@ -1,21 +1,24 @@
-export function render(versions, label) {
-    return [
-        '<div class="input-field col s4">',
-        '<select id="select_' + label + '">',
-        renderVersionOptions(versions),
-        '</select>',
-        '<label>Select ' + label + ' version:</label>',
-        '</div>'
-    ].join('');
-}
+export function getMatchingFixVersions() {
+    return new Promise((resolve, reject) => {
+        jira.project.getVersions({projectIdOrKey: 'SAM'}, (error, versions) => {
+            if (error) {
+                reject();
+                throw new Error("Could not retrieve versions. Cannot continue.");
+            }
 
-function renderVersionOptions(versions) {
-    let versionOptions = '';
-    versions.forEach(function (value) {
-        if (!value.released) {
-            versionOptions += '<option value="' + value.name + '">' + value.name + '</option>';
-        }
+            let matchingFixVersions = [];
+            let today = new Date();
+            let future = today.addWeeks(reportOptions.weeksInFuture);
+
+            versions.forEach((version) => {
+                let releaseDate = new Date(version.releaseDate);
+
+                if (!version.released && !version.overdue && (today <= releaseDate) && (releaseDate <= future)) {
+                    matchingFixVersions.push(version);
+                }
+            });
+
+            resolve(matchingFixVersions);
+        });
     });
-
-    return versionOptions;
 }

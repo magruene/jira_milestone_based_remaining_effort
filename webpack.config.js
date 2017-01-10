@@ -45,11 +45,9 @@ module.exports = {
             },
             output: {
                 comments: false
-            },
-            sourceMap: true
+            }
         })
     ],
-    devtool: 'source-map',
     node: {
         fs: "empty",
         net: 'empty',

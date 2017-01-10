@@ -28,16 +28,6 @@ const JIRA_BASE_URL = "https://jira.swisscom.com/rest/api/2/";
  */
 var gadgetId;
 
-
-// http://stackoverflow.com/questions/6117814/get-week-of-year-in-javascript-like-in-php
-Date.prototype.getWeekNumber = function () {
-    var d = new Date(+this);
-    d.setMilliseconds(0);
-    d.setHours(0, 0, 0);
-    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-    return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
-};
-
 /**
  * Init with an optional options object. If none is given, take defaultOptions
  * @param givenGadgetId
